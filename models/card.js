@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 
 const cardShema = new mongoose.Schema({
-  name:{
+  name: {
     type: String,
     required: true,
-    minLength:2,
-    maxLength:30
+    minLength: 2,
+    maxLength: 30,
   },
- link:{
+  link: {
     type: String,
-    required: true
+    required: true,
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -21,11 +21,11 @@ const cardShema = new mongoose.Schema({
     ref: 'user',
     default: [],
   }],
-  createdAt:{
+  createdAt: {
     type: Date,
-    default: Date.now
-  }
-})
+    default: Date.now,
+  },
+});
 
-const card = mongoose.model('card',cardShema);
-module.exports = card
+const card = mongoose.model('card', cardShema);
+module.exports = card;

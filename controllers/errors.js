@@ -3,10 +3,9 @@ const notFound = 404;
 const badRequest = 400;
 const serverIsBad = 500;
 
-
-module.exports={
+module.exports = {
   statusOk,
   notFound,
   badRequest,
-  serverIsBad
-}
+  serverIsBad,
+};
