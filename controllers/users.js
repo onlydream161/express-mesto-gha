@@ -1,26 +1,30 @@
 const User = require("../models/user");
+const { statusOk, notFound, badRequest, serverIsBad } = require("./errors");
 
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
-    return res.status(200).json(users);
+    return res.status(statusOk).json(users);
   } catch (e) {
     console.error(e);
-    return res.status(500).json({ message: `произошла ошибка ${e}` });
+    return res.status(serverIsBad).json({ message: "Ошибка Сервера " });
   }
 };
 
 const getUsersById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const user = await User.findById(id);
-    if (user === null) {
-      return res.status(404).json({ message: "user not found" });
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(notFound).json({ message: "user not found" });
     }
-    return res.status(200).json(user);
+    return res.status(statusOk).json(user);
   } catch (e) {
+    if (e.name === "CastError") {
+      return res.status(badRequest).json({ message: "Ошибка Сервера " });
+    }
     console.error(e);
-    return res.status(500).json({ message: `произошла ошибка ${e}` });
+    return res.status(serverIsBad).json({ message: "Ошибка Сервера " });
   }
 };
 
@@ -30,8 +34,11 @@ const postUser = async (req, res) => {
     await User.create({ name, about, avatar });
     return res.status(201).json({ name, about, avatar });
   } catch (e) {
+    if (e.name === 'ValidationError') {
+      res.status(badRequest).send({ message: "Ошибка Ошибка Валидации  " });
+       }
     console.error(e);
-    return res.status(500).json({ message: `произошла ошибка ${e}` });
+    return res.status(500).json({  message: "Ошибка Сервера " });
   }
 };
 
@@ -41,27 +48,33 @@ const updateProfile = async (req, res) => {
     await User.findByIdAndUpdate(
       req.user._id,
       { name, about },
-      { new: true }
+      { new: true , runValidators: true }
     ).then((user) => {
-      return res.status(200).json(user);
+      return res.status(statusOk).json(user);
     });
   } catch (e) {
+    if (e.name === 'ValidationError') {
+      res.status(badRequest).send({ message: "Ошибка Ошибка Валидации  " });
+       }
     console.error(e);
-    return res.status(500).json({ message: `произошла ошибка ${e}` });
+    return res.status(serverIsBad).json({  message: "Ошибка Сервера " });
   }
 };
 
 const updateAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
-    await User.findByIdAndUpdate(req.user._id, { avatar }, { new: true }).then(
+    await User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true }).then(
       (user) => {
-        return res.status(200).json(user);
+        return res.status(statusOk).json(user);
       }
     );
   } catch (e) {
+    if (e.name === 'ValidationError') {
+      res.status(badRequest).send({ message: "Ошибка Ошибка Валидации  " });
+       }
     console.error(e);
-    return res.status(500).json({ message: `произошла ошибка ${e}` });
+    return res.status(serverIsBad).json({ message: "Ошибка Сервера " });
   }
 };
 
